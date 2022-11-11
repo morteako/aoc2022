@@ -12,25 +12,10 @@ extra-source-files:
 - README.md
 
 default-extensions:
-  - OverloadedStrings
-  - ScopedTypeVariables
-  - TupleSections
-  - ViewPatterns
-  - PatternSynonyms
-  - DerivingVia
-  - DeriveFunctor
-  - DeriveTraversable
-  - DeriveFoldable
-  - DeriveGeneric
-  - GeneralizedNewtypeDeriving
-  - MultiWayIf
-  - GADTs
-  - InstanceSigs
-  - LambdaCase
-  - NamedFieldPuns
-  - RankNTypes
-  - TypeApplications
-  - TypeOperators
+ - OverloadedStrings
+ - ViewPatterns
+
+language: GHC2021
 
 dependencies:
   - base >= 4.7 && < 5

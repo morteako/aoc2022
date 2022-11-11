@@ -2,8 +2,7 @@ module Main (
   main,
 ) where
 
-import AllSolutions
-import qualified AoC2020.Solutions as AoC2020
+import Solutions (solutions)
 import CmdArgs
 import Control.Lens
 import Control.Monad (join, void)
@@ -17,9 +16,7 @@ import System.TimeIt
 import Utils ((=:))
 
 runner :: Options -> IO ()
-runner o@Options{day, input, year = yearEnum} = do
-  let year = getYear yearEnum
-  let solutions = getSolutionsForYear yearEnum
+runner o@Options{day, input} = do
   let lastDayNr :: DayVersion
       lastDayRunnner :: String -> IO ()
       (lastDayNr, lastDayRunnner) = Map.findMax solutions
@@ -40,12 +37,12 @@ runner o@Options{day, input, year = yearEnum} = do
     File path -> do
       readFile path
     Test -> do
-      let path = "inputs/" <> show year <> "/" <> show lastDayNr <> "test"
+      let path = "inputs/" <> "/" <> show lastDayNr <> "test"
       readFile path
     DayInput -> do
       case day of
-        LastDay -> getInput year (getDayNum lastDayNr)
-        SpecificDay d -> getInput year $ getDayNum d
+        LastDay -> getInput $ getDayNum lastDayNr
+        SpecificDay d -> getInput $ getDayNum d
   putStr "> "
   print o
   timeIt $ func inputFile
