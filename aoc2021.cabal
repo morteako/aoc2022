@@ -30,24 +30,17 @@ library
       ViewPatterns
   build-depends:
       HUnit
-    , aeson
-    , arithmoi
     , array
-    , base >=4.7 && <5
-    , base16-bytestring
+    , base >=4.16 && <5
     , bytestring
     , comonad
     , containers
-    , cryptohash-md5
     , digits
     , extra
     , fgl
-    , foldl
     , groupBy
     , haskell-src-meta
-    , heaps
     , lens
-    , lens-aeson
     , linear
     , megaparsec
     , memoize
@@ -55,14 +48,12 @@ library
     , ordered-containers
     , parsec
     , safe
-    , scientific
     , split
     , stringsearch
     , template-haskell
     , text
     , transformers
     , unordered-containers
-    , utf8-string
     , vector
   default-language: GHC2021
 
@@ -79,27 +70,20 @@ executable app
       ViewPatterns
   build-depends:
       HUnit
-    , aeson
     , aoc2021
-    , arithmoi
     , array
-    , base >=4.7 && <5
-    , base16-bytestring
+    , base >=4.16 && <5
     , bytestring
     , comonad
     , containers
-    , cryptohash-md5
     , digits
     , dotenv
     , extra
     , fgl
-    , foldl
     , groupBy
     , haskell-src-meta
-    , heaps
     , http-conduit
     , lens
-    , lens-aeson
     , linear
     , megaparsec
     , memoize
@@ -108,7 +92,6 @@ executable app
     , ordered-containers
     , parsec
     , safe
-    , scientific
     , split
     , stringsearch
     , template-haskell
@@ -116,6 +99,5 @@ executable app
     , timeit
     , transformers
     , unordered-containers
-    , utf8-string
     , vector
   default-language: GHC2021

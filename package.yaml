@@ -18,12 +18,11 @@ default-extensions:
 language: GHC2021
 
 dependencies:
-  - base >= 4.7 && < 5
+  - base >= 4.16 && < 5
   - lens
+  - linear
   - bytestring
   - text
-  - utf8-string
-  - base16-bytestring
   - stringsearch
   - megaparsec
   - parsec
@@ -33,26 +32,18 @@ dependencies:
   - containers
   - ordered-containers
   - unordered-containers
-  - foldl
   - extra
   - safe
   - split
   - groupBy
   - memoize
-  - linear
   - haskell-src-meta
   - template-haskell
   - vector
   - array
-  - HUnit
-  - aeson
-  - lens-aeson
-  - arithmoi
-  - scientific
-  - cryptohash-md5
   - digits
-  - heaps 
   - fgl
+  - HUnit
 
 library:
     source-dirs: src/lib

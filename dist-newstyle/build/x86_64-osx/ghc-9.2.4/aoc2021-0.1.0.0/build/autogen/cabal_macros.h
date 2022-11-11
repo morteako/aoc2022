@@ -20,26 +20,6 @@
   (major1) == 1 && (major2) <  6 || \
   (major1) == 1 && (major2) == 6 && (minor) <= 2)
 #endif /* MIN_VERSION_HUnit */
-/* package aeson-2.1.1.0 */
-#ifndef VERSION_aeson
-#define VERSION_aeson "2.1.1.0"
-#endif /* VERSION_aeson */
-#ifndef MIN_VERSION_aeson
-#define MIN_VERSION_aeson(major1,major2,minor) (\
-  (major1) <  2 || \
-  (major1) == 2 && (major2) <  1 || \
-  (major1) == 2 && (major2) == 1 && (minor) <= 1)
-#endif /* MIN_VERSION_aeson */
-/* package arithmoi-0.12.0.2 */
-#ifndef VERSION_arithmoi
-#define VERSION_arithmoi "0.12.0.2"
-#endif /* VERSION_arithmoi */
-#ifndef MIN_VERSION_arithmoi
-#define MIN_VERSION_arithmoi(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  12 || \
-  (major1) == 0 && (major2) == 12 && (minor) <= 0)
-#endif /* MIN_VERSION_arithmoi */
 /* package array-0.5.4.0 */
 #ifndef VERSION_array
 #define VERSION_array "0.5.4.0"
@@ -60,16 +40,6 @@
   (major1) == 4 && (major2) <  16 || \
   (major1) == 4 && (major2) == 16 && (minor) <= 3)
 #endif /* MIN_VERSION_base */
-/* package base16-bytestring-1.0.2.0 */
-#ifndef VERSION_base16_bytestring
-#define VERSION_base16_bytestring "1.0.2.0"
-#endif /* VERSION_base16_bytestring */
-#ifndef MIN_VERSION_base16_bytestring
-#define MIN_VERSION_base16_bytestring(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  0 || \
-  (major1) == 1 && (major2) == 0 && (minor) <= 2)
-#endif /* MIN_VERSION_base16_bytestring */
 /* package bytestring-0.11.3.1 */
 #ifndef VERSION_bytestring
 #define VERSION_bytestring "0.11.3.1"
@@ -100,16 +70,6 @@
   (major1) == 0 && (major2) <  6 || \
   (major1) == 0 && (major2) == 6 && (minor) <= 5)
 #endif /* MIN_VERSION_containers */
-/* package cryptohash-md5-0.11.101.0 */
-#ifndef VERSION_cryptohash_md5
-#define VERSION_cryptohash_md5 "0.11.101.0"
-#endif /* VERSION_cryptohash_md5 */
-#ifndef MIN_VERSION_cryptohash_md5
-#define MIN_VERSION_cryptohash_md5(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  11 || \
-  (major1) == 0 && (major2) == 11 && (minor) <= 101)
-#endif /* MIN_VERSION_cryptohash_md5 */
 /* package digits-0.3.1 */
 #ifndef VERSION_digits
 #define VERSION_digits "0.3.1"
@@ -140,16 +100,6 @@
   (major1) == 5 && (major2) <  8 || \
   (major1) == 5 && (major2) == 8 && (minor) <= 0)
 #endif /* MIN_VERSION_fgl */
-/* package foldl-1.4.12 */
-#ifndef VERSION_foldl
-#define VERSION_foldl "1.4.12"
-#endif /* VERSION_foldl */
-#ifndef MIN_VERSION_foldl
-#define MIN_VERSION_foldl(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  4 || \
-  (major1) == 1 && (major2) == 4 && (minor) <= 12)
-#endif /* MIN_VERSION_foldl */
 /* package groupBy-0.1.0.0 */
 #ifndef VERSION_groupBy
 #define VERSION_groupBy "0.1.0.0"
@@ -170,16 +120,6 @@
   (major1) == 0 && (major2) <  8 || \
   (major1) == 0 && (major2) == 8 && (minor) <= 11)
 #endif /* MIN_VERSION_haskell_src_meta */
-/* package heaps-0.4 */
-#ifndef VERSION_heaps
-#define VERSION_heaps "0.4"
-#endif /* VERSION_heaps */
-#ifndef MIN_VERSION_heaps
-#define MIN_VERSION_heaps(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  4 || \
-  (major1) == 0 && (major2) == 4 && (minor) <= 0)
-#endif /* MIN_VERSION_heaps */
 /* package lens-5.2 */
 #ifndef VERSION_lens
 #define VERSION_lens "5.2"
@@ -190,16 +130,6 @@
   (major1) == 5 && (major2) <  2 || \
   (major1) == 5 && (major2) == 2 && (minor) <= 0)
 #endif /* MIN_VERSION_lens */
-/* package lens-aeson-1.2.2 */
-#ifndef VERSION_lens_aeson
-#define VERSION_lens_aeson "1.2.2"
-#endif /* VERSION_lens_aeson */
-#ifndef MIN_VERSION_lens_aeson
-#define MIN_VERSION_lens_aeson(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  2 || \
-  (major1) == 1 && (major2) == 2 && (minor) <= 2)
-#endif /* MIN_VERSION_lens_aeson */
 /* package linear-1.21.10 */
 #ifndef VERSION_linear
 #define VERSION_linear "1.21.10"
@@ -270,16 +200,6 @@
   (major1) == 0 && (major2) <  3 || \
   (major1) == 0 && (major2) == 3 && (minor) <= 19)
 #endif /* MIN_VERSION_safe */
-/* package scientific-0.3.7.0 */
-#ifndef VERSION_scientific
-#define VERSION_scientific "0.3.7.0"
-#endif /* VERSION_scientific */
-#ifndef MIN_VERSION_scientific
-#define MIN_VERSION_scientific(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  3 || \
-  (major1) == 0 && (major2) == 3 && (minor) <= 7)
-#endif /* MIN_VERSION_scientific */
 /* package split-0.2.3.5 */
 #ifndef VERSION_split
 #define VERSION_split "0.2.3.5"
@@ -340,16 +260,6 @@
   (major1) == 0 && (major2) <  2 || \
   (major1) == 0 && (major2) == 2 && (minor) <= 19)
 #endif /* MIN_VERSION_unordered_containers */
-/* package utf8-string-1.0.2 */
-#ifndef VERSION_utf8_string
-#define VERSION_utf8_string "1.0.2"
-#endif /* VERSION_utf8_string */
-#ifndef MIN_VERSION_utf8_string
-#define MIN_VERSION_utf8_string(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  0 || \
-  (major1) == 1 && (major2) == 0 && (minor) <= 2)
-#endif /* MIN_VERSION_utf8_string */
 /* package vector-0.13.0.0 */
 #ifndef VERSION_vector
 #define VERSION_vector "0.13.0.0"
