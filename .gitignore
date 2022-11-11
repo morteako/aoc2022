@@ -80,3 +80,5 @@ bench.html
 
 # Emacs
 .projectile
+
+.env
