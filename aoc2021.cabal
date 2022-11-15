@@ -28,6 +28,9 @@ library
   default-extensions:
       OverloadedStrings
       ViewPatterns
+      OverloadedRecordDot
+      DuplicateRecordFields
+      NoFieldSelectors
   build-depends:
       HUnit
     , array
@@ -46,7 +49,6 @@ library
     , memoize
     , mtl
     , ordered-containers
-    , parsec
     , safe
     , split
     , stringsearch
@@ -68,6 +70,9 @@ executable app
   default-extensions:
       OverloadedStrings
       ViewPatterns
+      OverloadedRecordDot
+      DuplicateRecordFields
+      NoFieldSelectors
   build-depends:
       HUnit
     , aoc2021
@@ -90,7 +95,6 @@ executable app
     , mtl
     , optparse-applicative
     , ordered-containers
-    , parsec
     , safe
     , split
     , stringsearch

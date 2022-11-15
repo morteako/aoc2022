@@ -14,6 +14,9 @@ extra-source-files:
 default-extensions:
  - OverloadedStrings
  - ViewPatterns
+ - OverloadedRecordDot
+ - DuplicateRecordFields
+ - NoFieldSelectors
 
 language: GHC2021
 
@@ -25,7 +28,6 @@ dependencies:
   - text
   - stringsearch
   - megaparsec
-  - parsec
   - transformers
   - mtl
   - comonad
