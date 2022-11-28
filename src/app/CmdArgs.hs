@@ -1,11 +1,10 @@
 module CmdArgs where
 
-import qualified Data.Bifunctor as Bifunctor
+import Data.Bifunctor qualified as Bifunctor
 import DayVersion
 import Options.Applicative as Opt
 import Text.Megaparsec as Parsec
 import Text.Read (readMaybe)
-
 
 data Options = Options
   { day :: Day

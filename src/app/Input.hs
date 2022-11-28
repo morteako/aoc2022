@@ -6,7 +6,7 @@ import Configuration.Dotenv (defaultConfig, loadFile)
 import Control.Exception (IOException, catch, throwIO)
 import Control.Lens
 import Control.Monad (void)
-import qualified Data.ByteString as BS
+import Data.ByteString qualified as BS
 import Data.ByteString.Lens (packedChars, unpackedChars)
 import Network.HTTP.Simple (
   Request,

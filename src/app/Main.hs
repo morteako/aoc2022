@@ -2,16 +2,16 @@ module Main (
   main,
 ) where
 
-import Solutions (solutions)
 import CmdArgs
 import Control.Lens
 import Control.Monad (join, void)
 import Data.Bitraversable (Bitraversable (bitraverse))
-import qualified Data.Map as Map
-import qualified Data.Map.Strict as Map
+import Data.Map qualified as Map
+import Data.Map.Strict qualified as Map
 import DayVersion
 import Input (getInput)
 import Options.Applicative (execParser)
+import Solutions (solutions)
 import System.TimeIt
 import Utils ((=:))
 
@@ -46,8 +46,6 @@ runner o@Options{day, input} = do
   putStr "> "
   print o
   timeIt $ func inputFile
-
-log s = putStrLn $ "> " <> s
 
 main :: IO ()
 main = do
