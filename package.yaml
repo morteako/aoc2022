@@ -1,8 +1,8 @@
-name:                aoc2021
+name:                aoc2022
 version:             0.1.0.0
 #synopsis:
 #description:
-homepage:            https://github.com/githubuser/aoc2021#readme
+homepage:            https://github.com/githubuser/aoc2022#readme
 license:             BSD3
 author:              Morten Kolstad
 maintainer:          example@example.com
@@ -51,14 +51,14 @@ library:
     source-dirs: src/lib
     when:
       - condition: false
-        other-modules: Paths_aoc2021
+        other-modules: Paths_aoc2022
 
 executables:
   app:
     source-dirs:      src/app
     main:             Main.hs
     dependencies:
-      - aoc2021
+      - aoc2022
       - timeit
       - http-conduit
       - dotenv
