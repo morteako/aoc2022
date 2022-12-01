@@ -20,7 +20,10 @@ extra-source-files:
 library
   exposed-modules:
       Day.Day01
+      Day.DayTemplate
       DayVersion
+      Generically
+      Patterns
       Solutions
       Utils
   hs-source-dirs:
@@ -31,6 +34,7 @@ library
       OverloadedRecordDot
       DuplicateRecordFields
       NoFieldSelectors
+      QualifiedDo
   build-depends:
       HUnit
     , array
@@ -73,6 +77,7 @@ executable app
       OverloadedRecordDot
       DuplicateRecordFields
       NoFieldSelectors
+      QualifiedDo
   build-depends:
       HUnit
     , aoc2022

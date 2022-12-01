@@ -17,6 +17,7 @@ default-extensions:
  - OverloadedRecordDot
  - DuplicateRecordFields
  - NoFieldSelectors
+ - QualifiedDo
 
 language: GHC2021
 

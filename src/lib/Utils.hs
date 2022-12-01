@@ -2,7 +2,7 @@ module Utils where
 
 import Data.Foldable (Foldable (foldl'))
 import Data.List.Extra hiding (foldl1')
-import qualified Data.Map.Lazy as Map
+import Data.Map.Lazy qualified as Map
 import Data.Maybe (fromMaybe)
 import Data.Semigroup (Sum (Sum, getSum))
 import Debug.Trace
@@ -15,6 +15,7 @@ readInt = read
 (?:) :: Maybe c -> c -> c
 (?:) = flip fromMaybe
 
+(=:) :: a -> b -> (a, b)
 (=:) = (,)
 
 count :: Eq a => a -> [a] -> Int
@@ -47,6 +48,7 @@ foldl1' f xs =
                 Just x -> f x y
             )
 
+printMap :: (Show a, Eq k) => Map.Map (V2 k) a -> IO ()
 printMap m = do
     putStrLn "--------"
     let xs = Map.toList m
@@ -55,4 +57,8 @@ printMap m = do
     mapM_ print gg
     putStrLn ""
 
+traceLab :: Show a => [Char] -> a -> a
 traceLab s x = trace (s ++ ": " ++ show x) x
+
+traceOn :: Show a => (a -> [Char]) -> a -> a
+traceOn f x = trace (f x) x
