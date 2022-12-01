@@ -1,28 +1,29 @@
 module Day.Day01 where
 
+import Data.List (sort)
+import Data.List.Extra (splitOn, takeEnd)
 import Test.HUnit ((@=?))
 
-parse :: String -> [Int]
-parse = fmap (read @Int) . lines
+parse :: [Char] -> [[Int]]
+parse = fmap (fmap read . words) . splitOn "\n\n"
 
-countIncreases :: [Int] -> Int
-countIncreases = length . filter (uncurry (<)) . (zip <*> tail)
+solveA :: [[Int]] -> Int
+solveA = maximum . fmap sum
 
-solveA :: [Int] -> Int
-solveA = countIncreases
-
-solveB :: [Int] -> Int
-solveB = countIncreases . (fmap (sum . take 3) . drop 3 . scanl (flip (:)) [])
-
-slidingTriples :: [a] -> [[a]]
-slidingTriples = drop 3 . scanl (flip (:)) []
+solveB :: [[Int]] -> Int
+solveB = sum . takeEnd 3 . sort . fmap sum
 
 run :: String -> IO ()
 run xs = do
+  print xs
   let parsed = parse xs
+  print parsed
   let resA = solveA parsed
   print resA
-  resA @=? 1715
+
+  resA @=? 75501
+
   let resB = solveB parsed
   print resB
-  resB @=? 1739
+
+  resB @=? 215594
