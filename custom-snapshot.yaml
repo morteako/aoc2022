@@ -1,2 +1,0 @@
-resolver: lts-20.0 # Inherits GHC version and package set
-compiler: ghc-9.2.4 # Overwrites GHC version in the resolver, optional
