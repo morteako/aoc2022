@@ -1,9 +1,9 @@
 module Solutions where
 
-import qualified Day.Day01
+import Day.Day01 qualified
 
 import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import DayVersion (DayVersion (NormalDay, SpecialVersion))
 import Utils
 
