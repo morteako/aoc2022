@@ -20,6 +20,7 @@ extra-source-files:
 library
   exposed-modules:
       Day.Day01
+      Day.Day02
       Day.DayTemplate
       DayVersion
       Generically
