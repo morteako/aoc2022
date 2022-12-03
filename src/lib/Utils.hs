@@ -24,11 +24,6 @@ count x = getSum . foldMap (Sum . fromEnum . (== x))
 countP :: Foldable f => (a -> Bool) -> f a -> Int
 countP p = getSum . foldMap (Sum . fromEnum . p)
 
-newtype MIntersect k v = MIntersect (Map.Map k v)
-
-instance (Ord k, Semigroup v) => Semigroup (MIntersect k v) where
-    MIntersect a <> MIntersect b = MIntersect $ Map.intersectionWith (<>) a b
-
 semiFoldMapl' :: (Semigroup v, Functor f, Foldable f) => (a -> v) -> f a -> v
 semiFoldMapl' av = foldl1' (<>) . fmap av
 

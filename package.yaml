@@ -18,6 +18,10 @@ default-extensions:
  - NamedFieldPuns
  - TypeOperators
  - PartialTypeSignatures
+ - DerivingVia
+ - DeriveFoldable
+ - DeriveFunctor
+ - FlexibleContexts
 
 ghc-options:
   - -fno-warn-partial-type-signatures
@@ -48,6 +52,7 @@ dependencies:
   - digits
   - fgl
   - HUnit
+  - lattices
 
 library:
     source-dirs: src/lib
