@@ -23,7 +23,6 @@ library
       Day.Day02
       Day.DayTemplate
       DayVersion
-      Generically
       Patterns
       Solutions
       Utils
@@ -32,14 +31,13 @@ library
   default-extensions:
       OverloadedStrings
       ViewPatterns
-      OverloadedRecordDot
-      DuplicateRecordFields
-      NoFieldSelectors
-      QualifiedDo
+      ImportQualifiedPost
+      NamedFieldPuns
+      TypeOperators
   build-depends:
       HUnit
     , array
-    , base >=4.16 && <5
+    , base >=4.14 && <5
     , bytestring
     , comonad
     , containers
@@ -62,7 +60,7 @@ library
     , transformers
     , unordered-containers
     , vector
-  default-language: GHC2021
+  default-language: Haskell2010
 
 executable app
   main-is: Main.hs
@@ -75,15 +73,14 @@ executable app
   default-extensions:
       OverloadedStrings
       ViewPatterns
-      OverloadedRecordDot
-      DuplicateRecordFields
-      NoFieldSelectors
-      QualifiedDo
+      ImportQualifiedPost
+      NamedFieldPuns
+      TypeOperators
   build-depends:
       HUnit
     , aoc2022
     , array
-    , base >=4.16 && <5
+    , base >=4.14 && <5
     , bytestring
     , comonad
     , containers
@@ -110,4 +107,4 @@ executable app
     , transformers
     , unordered-containers
     , vector
-  default-language: GHC2021
+  default-language: Haskell2010
