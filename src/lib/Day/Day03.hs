@@ -17,14 +17,17 @@ parseBackpacksInHalves = fmap into2 . lines
  where
   into2 xs = over each Set.fromList $ splitAt (length xs `div` 2) xs
 
-sumOfCommonItemPrioritiesInHalves :: [(Set.Set Char, Set.Set Char)] -> Integer
-sumOfCommonItemPrioritiesInHalves = sumOf (folded . folded . to priority) . fmap (uncurry Set.intersection)
-
 parseBackpacksInTriples :: String -> [[Set.Set Char]]
 parseBackpacksInTriples = chunksOf 3 . fmap Set.fromList . lines
 
+sumOfCombinedItems :: (Foldable f1, Foldable f2) => (a -> f2 Char) -> f1 a -> Integer
+sumOfCombinedItems combiner = sumOf (folded . to combiner . folded . to priority)
+
+sumOfCommonItemPrioritiesInHalves :: [(Set.Set Char, Set.Set Char)] -> Integer
+sumOfCommonItemPrioritiesInHalves = sumOfCombinedItems (uncurry Set.intersection)
+
 sumOfCommonItemPrioritiesInTriples :: [[Set.Set Char]] -> Integer
-sumOfCommonItemPrioritiesInTriples = sumOf (folded . folded . to priority) . fmap (foldr1 Set.intersection)
+sumOfCommonItemPrioritiesInTriples = sumOfCombinedItems (foldr1 Set.intersection)
 
 run :: String -> IO ()
 run xs = do
