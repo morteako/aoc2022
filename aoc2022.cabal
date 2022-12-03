@@ -35,6 +35,8 @@ library
       ImportQualifiedPost
       NamedFieldPuns
       TypeOperators
+      PartialTypeSignatures
+  ghc-options: -fno-warn-partial-type-signatures
   build-depends:
       HUnit
     , array
@@ -77,6 +79,8 @@ executable app
       ImportQualifiedPost
       NamedFieldPuns
       TypeOperators
+      PartialTypeSignatures
+  ghc-options: -fno-warn-partial-type-signatures
   build-depends:
       HUnit
     , aoc2022
