@@ -62,6 +62,3 @@ traceLab s x = trace (s ++ ": " ++ show x) x
 
 traceOn :: Show a => (a -> [Char]) -> a -> a
 traceOn f x = trace (f x) x
-
-
-f True = 1
