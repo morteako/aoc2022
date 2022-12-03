@@ -21,6 +21,7 @@ library
   exposed-modules:
       Day.Day01
       Day.Day02
+      Day.Day03
       Day.DayTemplate
       DayVersion
       Patterns

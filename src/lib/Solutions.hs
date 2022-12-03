@@ -5,6 +5,7 @@ import Day.Day02 qualified
 
 import Data.Map (Map)
 import Data.Map qualified as Map
+import Day.Day03 qualified
 import DayVersion (DayVersion (NormalDay, SpecialVersion))
 import Utils
 
@@ -13,4 +14,5 @@ solutions =
   Map.fromList
     [ "01" =: Day.Day01.run
     , "02" =: Day.Day02.run
+    , "03" =: Day.Day03.run
     ]
