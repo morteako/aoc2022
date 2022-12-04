@@ -25,6 +25,7 @@ library
       Day.Day03Monoid
       Day.DayTemplate
       DayVersion
+      Letter
       Solutions
       Utils
   hs-source-dirs:
