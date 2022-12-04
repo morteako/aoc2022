@@ -1,6 +1,6 @@
 module Day.Day04 where
 
-import Data.List.Extra
+import Data.List.Extra (splitOn)
 import Test.HUnit ((@=?))
 import Utils (countP, readInt)
 
@@ -11,39 +11,31 @@ parseSections = fmap (parseSection . splitOn ",") . lines
   toSection [[a, b], [c, d]] = ((a, b), (c, d))
   toSection _ = error ""
 
-isContained :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Bool
+isContained :: (Int, Int) -> (Int, Int) -> Bool
 isContained (a1, a2) (b1, b2) = a1 >= b1 && a2 <= b2
 
--- countIntervals pred = length . filter predBothWays
---   where
---     predBot
-
-countFullyContained :: [((Int, Int), (Int, Int))] -> Int
-countFullyContained = length . filter anyIsContained
+countIntervals :: (t -> t -> Bool) -> [(t, t)] -> Int
+countIntervals pred = length . filter predBoth
  where
-  anyIsContained (x, y) = isContained x y || isContained y x
+  predBoth (x, y) = pred x y || pred y x
 
+isOverlapping :: Ord a => (a, a) -> (a, a) -> Bool
 isOverlapping (a1, a2) (b1, b2)
   | a1 == b1 = True
   | a1 < b1 && a2 >= b1 = True
   | a1 > b1 && a1 <= b2 = True
   | otherwise = False
 
-countOverlaps :: [((Int, Int), (Int, Int))] -> Int
-countOverlaps = length . filter anyIsOverlapping
- where
-  anyIsOverlapping (x, y) = isOverlapping x y || isOverlapping y x
-
 run :: String -> IO ()
 run xs = do
   let parsed = parseSections xs
 
-  let resA = countFullyContained parsed
+  let resA = countIntervals isContained parsed
   print resA
 
   resA @=? 511
 
-  let resB = countOverlaps parsed
+  let resB = countIntervals isOverlapping parsed
   print resB
 
   resB @=? 821
