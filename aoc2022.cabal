@@ -23,6 +23,7 @@ library
       Day.Day02
       Day.Day03
       Day.Day03Monoid
+      Day.Day04
       Day.DayTemplate
       DayVersion
       Letter
