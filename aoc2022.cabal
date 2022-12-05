@@ -25,6 +25,7 @@ library
       Day.Day03Monoid
       Day.Day04
       Day.Day05
+      Day.Day05StateLens
       DayVersion
       Letter
       Solutions
