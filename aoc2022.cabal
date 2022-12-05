@@ -24,7 +24,7 @@ library
       Day.Day03
       Day.Day03Monoid
       Day.Day04
-      Day.DayTemplate
+      Day.Day05
       DayVersion
       Letter
       Solutions
