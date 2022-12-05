@@ -17,9 +17,9 @@ parse = parseStacksAndMoves . splitOn "\n\n"
   parseStacksAndMoves [stacks, moves] = (parseStacks stacks, fmap parseMove $ lines moves)
   parseStacksAndMoves _ = error ""
 
-  parseStacks x = IntMap.fromList $ zip [1 ..] $ fmap init $ removeNonStacks transpose $ lines x
+  parseStacks x = IntMap.fromList $ zip [1 ..] $ fmap init $ removeNonStacks $ transpose $ lines x
    where
-    removeNonStacks = fmap (filter (Char.isLetter . head) . filter (not . null) . fmap (filter $ not . Char.isSpace))
+    removeNonStacks = (filter (Char.isLetter . head) . filter (not . null) . fmap (filter (not . Char.isSpace)))
 
   parseMove (words -> ["move", a, "from", b, "to", c]) = Move (readInt a) (readInt b :-> readInt c)
   parseMove _ = error ""
