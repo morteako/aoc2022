@@ -6,7 +6,7 @@ import Test.HUnit ((@=?))
 isUniq :: Ord a => [a] -> Bool
 isUniq = (==) <*> nub
 
--- findMarkerIndex :: Ord a => Int -> [a] -> Int
+findMarkerIndex :: Ord a => Int -> [a] -> Maybe Int
 findMarkerIndex i =
   fmap fst
     . find (isUniq . snd)
