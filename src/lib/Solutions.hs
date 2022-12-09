@@ -13,8 +13,9 @@ import Day.Day08 qualified
 
 import Data.Map (Map)
 import Data.Map qualified as Map
+import Day.Day09 qualified
 import DayVersion (DayVersion (NormalDay, SpecialVersion))
-import Utils
+import Utils ((=:))
 
 solutions :: Map DayVersion (String -> IO ())
 solutions =
@@ -29,4 +30,5 @@ solutions =
     , "06" =: Day.Day06.run
     , "07" =: Day.Day07.run
     , "08" =: Day.Day08.run
+    , "09" =: Day.Day09.run
     ]
