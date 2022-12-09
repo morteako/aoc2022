@@ -1,4 +1,4 @@
-module Day.DayTemplate where
+module Day.DayTemplate (run) where
 
 import Test.HUnit ((@=?))
 
