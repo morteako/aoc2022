@@ -8,10 +8,11 @@ import Day.Day04 qualified
 import Day.Day05 qualified
 import Day.Day05StateLens qualified
 import Day.Day06 qualified
+import Day.Day07 qualified
+import Day.Day08 qualified
 
 import Data.Map (Map)
 import Data.Map qualified as Map
-import Day.Day07 qualified
 import DayVersion (DayVersion (NormalDay, SpecialVersion))
 import Utils
 
@@ -27,4 +28,5 @@ solutions =
     , "05StateLens" =: Day.Day05StateLens.run
     , "06" =: Day.Day06.run
     , "07" =: Day.Day07.run
+    , "08" =: Day.Day08.run
     ]

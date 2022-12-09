@@ -28,6 +28,7 @@ library
       Day.Day05StateLens
       Day.Day06
       Day.Day07
+      Day.Day08
       Day.DayTemplate
       DayVersion
       Letter
