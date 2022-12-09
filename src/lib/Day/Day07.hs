@@ -1,28 +1,28 @@
-{-# LANGUAGE GADTs #-}
+module Day.Day07 (run) where
 
-module Day.Day07 where
-
-import Control.Lens
 import Data.List
-import Data.List.Extra (groupBy, splitOn, stripPrefix)
+import Data.List.Extra (groupBy, splitOn, stripPrefix, sumOn')
 import Data.Map (Map)
 import Data.Map qualified as Map
-import Debug.Trace
+
 import Test.HUnit ((@=?))
 
-data FileDir a = File Int String | Dir a deriving (Show)
+data FileDir = File Int String | Dir String deriving (Show)
 
-data Path = DotDot | Outer | Specific String deriving (Show)
+data Path' = DotDot | Outer | Specific String deriving (Show)
 
-data Execution a = CD Path | LS [FileDir a] deriving (Show)
+data Execution = CD Path' | LS [FileDir] deriving (Show)
 
-sDollar ('$' : _) = True
-sDollar _ = False
+data Path = Root | Path :/ String deriving (Eq, Ord)
 
-parse :: String -> [Execution String]
+moveUp :: Path -> Path
+moveUp Root = Root
+moveUp (p :/ _) = p
+
+parse :: String -> [Execution]
 parse = fmap parseExec . groupBy f . lines
  where
-  f _ b = not (sDollar b)
+  f _ b = not (isPrefixOf "$" b)
 
   parseExec [s]
     | Just path <- stripPrefix "$ cd " s =
@@ -39,65 +39,50 @@ parse = fmap parseExec . groupBy f . lines
         File (read size) name
   parseFileDir s = error $ show s
 
--- newtype M = M (Map String (FileDir M)) deriving (Show)
-
-getPaths = getPaths' []
+makeMap :: [Execution] -> Map Path [FileDir]
+makeMap = Map.fromList . getPaths' Root
  where
   getPaths' curPath [] = []
   getPaths' curPath ((LS fds) : rest) = (curPath, fds) : getPaths' curPath rest
   getPaths' curPath ((CD pa) : rest) = getPaths' newP rest
    where
     newP = case pa of
-      DotDot -> (tail curPath)
-      Outer -> []
-      (Specific s) -> (s : curPath)
+      DotDot -> moveUp curPath
+      Outer -> Root
+      Specific s -> curPath :/ s
 
-makeMap = Map.fromList . getPaths
-
-countSize :: [String] -> Map [String] [FileDir String] -> Int
+countSize :: Path -> Map Path [FileDir] -> Int
 countSize path m
-  | Just fd <- Map.lookup path m =
-      sum $ fmap f fd
+  | Just fd <- Map.lookup path m = sumOn' f fd
  where
   f (File i _) = i
-  f (Dir s) = countSize (s : path) m
+  f (Dir s) = countSize (path :/ s) m
 countSize _ _ = error ""
 
--- \| otherwise = error $ show (path,m)
--- where
---   f k (Dir d) = countSizes ((d:k) Map.! m)
-
-solveA = sum . filter (<= 100000) . q . makeMap
+sumOfSmallDirs :: [Execution] -> Int
+sumOfSmallDirs = sum . filter (<= 100000) . getSizes . makeMap
  where
-  q m = fmap (flip countSize m) $ Map.keys m
+  getSizes m = fmap (\path -> countSize path m) $ Map.keys m
 
-maxFolder = q . makeMap
+findSmallestDirSizeThatFreesSpace :: [Execution] -> Maybe Int
+findSmallestDirSizeThatFreesSpace execs = getFirst sizes
  where
-  q m = countSize [] m
+  getFirst = find (\x -> x + targetMin >= 30000000)
+  targetMin = 70000000 - maximum sizes
 
-solveB execs = (getFirst . q . makeMap $ execs, targetMin)
- where
-  getFirst = head . filter (\x -> x + targetMin >= 30000000)
-  targetMin = 70000000 - traceShowId (maxFolder execs)
+  fileMap = makeMap execs
 
-  q m = sort $ fmap (flip countSize m) $ Map.keys m
-
-type MM a = Map Int a
+  sizes = sort $ fmap (\path -> countSize path fileMap) $ Map.keys fileMap
 
 run :: String -> IO ()
 run xs = do
-  -- print xs
   let parsed = parse xs
-  mapM_ print parsed
 
-  mapM_ print $ getPaths parsed
-  print $ makeMap parsed
-
-  let resA = solveA parsed
+  let resA = sumOfSmallDirs parsed
   print resA
 
-  -- resA @=? 1715
-  let resB = solveB parsed
+  resA @=? 1118405
+  let resB = findSmallestDirSizeThatFreesSpace parsed
   print resB
 
--- resB @=? 1739
+  resB @=? Just 12545514
