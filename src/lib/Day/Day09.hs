@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiWayIf #-}
+
 module Day.Day09 (run) where
 
 import Control.Lens (view)
@@ -10,7 +12,10 @@ import Test.HUnit ((@=?))
 import Utils (readInt)
 import Utils qualified
 
-data Dir = R | L | D | U deriving (Show, Read, Enum)
+data Dir = R | L | D | U deriving (Read, Enum, Show)
+
+instance Show Dot where
+  show (Dot l (V2 x y)) = show l ++ " " ++ show (x, y)
 
 data Move a = a :> Int deriving (Show, Functor)
 
@@ -24,71 +29,6 @@ dirToVec L = V2 (-1) 0
 dirToVec D = V2 0 (-1)
 dirToVec U = V2 0 1
 
--- isDia a b =
---   elem a $ map (b +) $ V2 <$> [1, (-1)] <*> [1, (-1)]
-
--- getWeirdLine target tail =
---   elem tail $ map (target +) $ map dirToVec [R .. U]
-
--- getWeirdDiagonal target tail
---   | tail + V2 2 1 == target = Just $ tail + 1
---   | tail + V2 2 (-1) == target = Just $ tail + V2 1 (-1)
---   | tail + V2 (-2) (-1) == target = Just $ tail + V2 (-1) (-1)
---   | tail + V2 (-2) (1) == target = Just $ tail + V2 (-1) (1)
--- getWeirdDiagonal _ _ = Nothing
-
--- doDirTwo [] ht = traceLab "_____" [ht]
--- doDirTwo ((_ :> 0) : rest) ht = doDirTwo rest ht
--- doDirTwo (dn : _) ht
---   | traceShow (dn, ht) False = undefined
--- doDirTwo (d :> (subtract 1 -> n) : rest) [h, t] = [h, t] : doDirTwo (d :> n : rest) newHT
---  where
---   dv = dirToVec d
-
---   newHT = [h', t']
---   h' = h + dv
---   t' = getTail ()
-
---   getTail ()
---     | h == t = traceLab "start" t -- start
---     | h' == t = traceLab "overlap" t -- overlap
---     | getWeirdLine h' t = traceLab "weird" t -- weird
---     | isDia h' t = traceLab "newDirCase" t -- newDirCase
---     | h == t + dv = traceLab "normal case" h -- normal case
---     | isDia h t = traceLab "diagonal" h -- diagonal
---     -- \| hx' == tx || hy' == ty = t + d
---     | otherwise = error $ "hmmm " <> show (d, h, t)
--- doDirTwo _ _ = undefined
-
-data NDir
-  = NL
-  | NR
-  | NU
-  | ND
-  | NUR
-  | NUL
-  | NDR
-  | NDL
-  | Stay
-  deriving (Show)
-
-getNDirVec :: NDir -> V2 Int
-getNDirVec NR = V2 1 0
-getNDirVec NL = V2 (-1) 0
-getNDirVec ND = V2 0 (-1)
-getNDirVec NU = V2 0 1
-getNDirVec NUR = 1
-getNDirVec NUL = V2 (-1) 1
-getNDirVec NDR = V2 1 (-1)
-getNDirVec NDL = -1
-getNDirVec Stay = 0
-
-toNDir :: Dir -> NDir
-toNDir R = NR
-toNDir L = NL
-toNDir D = ND
-toNDir U = NU
-
 data Label = H | T | Lab Int
 
 instance Show Label where
@@ -96,43 +36,48 @@ instance Show Label where
   show T = "T"
   show (Lab n) = show n
 
-data Dot = Dot Label (V2 Int) deriving (Show)
+data Dot = Dot Label (V2 Int) deriving ()
 
 getDotPos (Dot _ p) = p
 
 un = undefined
 
-debug = True
+debug = False
 
 traceLab s x = if debug then Utils.traceLab s x else x
 
-doDir [] ht = traceLab "_____" [ht]
-doDir ((_ :> 0) : rest) ht = doDir rest ht
-doDir (dn : _) ht
-  | traceShow (dn, ht) False = undefined
-doDir (d :> (subtract 1 -> n) : rest) ht@[Dot hlab hpos, tdot] = ht : doDir (d :> n : rest) newHT
+doDirNew [] ht = traceLab "_____" [ht]
+doDirNew ((_ :> 0) : rest) ht = doDirNew rest ht
+-- doDirNew (dn : _) ht
+--   | traceShow ("hop", dn, ht) False = undefined
+doDirNew (d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDirNew (d :> n : rest) newHT
  where
   moveDir = dirToVec d
-
-  newHT = [Dot hlab newHPos, t']
   newHPos = hpos + moveDir
-
   newH = Dot hlab newHPos
 
-  t' = getTail hpos newH tdot
+  newHT = getTails hpos newH ts
 
-  getTail prevHead (Dot curHeadLab curHeadPos) tt@(Dot tlab tpos)
-    | curHeadPos == tpos = traceLab "same spot - stay" $ Dot tlab tpos
-    | isTouching curHeadPos tpos = traceLab "isTouching stay" $ Dot tlab tpos
-    | Just nextTPos <- isTwoDirAway curHeadPos tpos = traceLab "sameDir *2" $ Dot tlab nextTPos
-    | isDoubleDiag curHeadPos tpos = traceLab "doubleDiag usePrev" $ Dot tlab prevHead
-    | otherwise = error $ "hmmm " <> show (d, curHeadPos, tt)
-doDir _ _ = undefined
-
-a .+ dir = a + getNDirVec dir
+  getTails prevHead d@(Dot curHeadLab curHeadPos) [] = [d]
+  getTails prevHead d@(Dot curHeadLab curHeadPos) (tt@(Dot tlab tpos) : tts) =
+    let res =
+          if
+              | curHeadPos == tpos ->
+                  traceLab "same spot - stay" $ Dot tlab tpos
+              | isTouching curHeadPos tpos ->
+                  traceLab "isTouching stay" $ Dot tlab tpos
+              | Just nextTPos <- isTwoDirAway curHeadPos tpos ->
+                  traceLab "sameDir *2" $ Dot tlab nextTPos
+              | isDoubleDiag curHeadPos tpos ->
+                  traceLab "doubleDiag usePrev" $ Dot tlab prevHead
+              | otherwise ->
+                  error "hmm"
+     in d : getTails tpos res tts
+doDirNew _ _ = undefined
 
 isTouching a b = case abs (a - b) of
-  V2 1 1 -> True
+  V2 1 1 ->
+    True
   V2 1 0 -> True
   V2 0 1 -> True
   _ -> False
@@ -155,11 +100,13 @@ more f = length . nub . fmap f . fmap last
 
 -- solveA moves = more id $ doDirTwo moves [0, 0]
 
-solveA' moves = more getDotPos $ doDir moves [Dot H 0, Dot T 0]
+solveA moves = length . nub . fmap getDotPos . fmap last $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1]
+
+solveB moves = id $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1 .. 9]
+ where
+  m = length . nub . fmap getDotPos . fmap last
 
 -- f !(cur : (traceLab "cd" -> cs)) (traceLab "f" -> dir) = doDir dir cur ++ cur : cs
-
-solveB = id
 
 run :: String -> IO ()
 run xs = do
@@ -167,12 +114,14 @@ run xs = do
   print parsed
   -- print resA
 
-  let resA = solveA' parsed
+  let resA = solveA parsed
+  print resA
   -- mapM_ print $ groupOn (view _x) $ sort $ nub $ fmap snd $ solveA parsed
   -- print "--"
   -- mapM print $ sort $ fmap snd $ solveA parsed
 
-  print resA
+  let resB = solveB parsed
+  mapM print resB
 
   -- mapM_ print $ zip resA resA'
 
