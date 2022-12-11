@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiWayIf #-}
 
 module Day.Day09 (run) where
@@ -6,6 +7,7 @@ import Control.Lens (view)
 import Data.Containers.ListUtils (nubOrd)
 import Data.List
 import Data.List.Extra
+import Data.Map qualified as Map
 import Debug.Trace
 import Linear
 import Test.HUnit ((@=?))
@@ -15,7 +17,7 @@ import Utils qualified
 data Dir = R | L | D | U deriving (Read, Enum, Show)
 
 instance Show Dot where
-  show (Dot l (V2 x y)) = show l ++ " " ++ show (x, y)
+  show (Dot l (V2 x y)) = "D" ++ show l ++ " " ++ show (x, y)
 
 data Move a = a :> Int deriving (Show, Functor)
 
@@ -29,7 +31,7 @@ dirToVec L = V2 (-1) 0
 dirToVec D = V2 0 (-1)
 dirToVec U = V2 0 1
 
-data Label = H | T | Lab Int
+data Label = H | T | Lab Int deriving (Eq, Ord)
 
 instance Show Label where
   show H = "H"
@@ -40,17 +42,9 @@ data Dot = Dot Label (V2 Int) deriving ()
 
 getDotPos (Dot _ p) = p
 
-un = undefined
-
-debug = False
-
-traceLab s x = if debug then Utils.traceLab s x else x
-
-doDirNew [] ht = traceLab "_____" [ht]
+doDirNew [] ht = [ht]
 doDirNew ((_ :> 0) : rest) ht = doDirNew rest ht
--- doDirNew (dn : _) ht
---   | traceShow ("hop", dn, ht) False = undefined
-doDirNew (d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDirNew (d :> n : rest) newHT
+doDirNew ddd@(d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDirNew (d :> n : rest) newHT
  where
   moveDir = dirToVec d
   newHPos = hpos + moveDir
@@ -58,22 +52,41 @@ doDirNew (d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDirNew
 
   newHT = getTails hpos newH ts
 
-  getTails prevHead d@(Dot curHeadLab curHeadPos) [] = [d]
-  getTails prevHead d@(Dot curHeadLab curHeadPos) (tt@(Dot tlab tpos) : tts) =
+  getTails prevHead d@(Dot _ curHeadPos) [] = [d]
+  getTails prevHead d@(Dot _ curHeadPos) (tt@(Dot tlab tpos) : tts) =
     let res =
           if
+              | newHPos == tpos ->
+                  Dot tlab tpos
               | curHeadPos == tpos ->
-                  traceLab "same spot - stay" $ Dot tlab tpos
-              | isTouching curHeadPos tpos ->
-                  traceLab "isTouching stay" $ Dot tlab tpos
+                  Dot tlab tpos
+              | prevHead == curHeadPos ->
+                  Dot tlab tpos
+              | prevHead == tpos ->
+                  Dot tlab tpos
               | Just nextTPos <- isTwoDirAway curHeadPos tpos ->
-                  traceLab "sameDir *2" $ Dot tlab nextTPos
+                  Dot tlab nextTPos
+              | isLineTouch curHeadPos tpos ->
+                  Dot tlab tpos
+              | Just dirV <- isDiag prevHead curHeadPos ->
+                  Dot tlab (tpos + dirV)
+              | isTouching curHeadPos tpos ->
+                  Dot tlab tpos
               | isDoubleDiag curHeadPos tpos ->
-                  traceLab "doubleDiag usePrev" $ Dot tlab prevHead
-              | otherwise ->
-                  error "hmm"
+                  Dot tlab prevHead
+              | otherwise -> error $ "hmm" ++ show (ddd, prevHead, curHeadPos, tt)
      in d : getTails tpos res tts
 doDirNew _ _ = undefined
+
+isDiag a b = case abs (a - b) of
+  V2 1 1 ->
+    Just $ fmap (negate) (a - b)
+  _ -> Nothing
+
+isLineTouch a b = case abs (a - b) of
+  V2 1 0 -> True
+  V2 0 1 -> True
+  _ -> False
 
 isTouching a b = case abs (a - b) of
   V2 1 1 ->
@@ -96,33 +109,51 @@ isTwoDirAway a b = case (a - b) of
 
 -- \| view _x h ==
 
-more f = length . nub . fmap f . fmap last
+more = length . nub . fmap getDotPos . fmap last
 
 -- solveA moves = more id $ doDirTwo moves [0, 0]
 
 solveA moves = length . nub . fmap getDotPos . fmap last $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1]
 
-solveB moves = id $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1 .. 9]
- where
-  m = length . nub . fmap getDotPos . fmap last
+solveB moves = more $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1 .. 9]
 
 -- f !(cur : (traceLab "cd" -> cs)) (traceLab "f" -> dir) = doDir dir cur ++ cur : cs
+
+makeMap :: [Dot] -> Map.Map (V2 Int) [Label]
+makeMap = Map.unionWith (<>) defMap . Map.fromListWith (<>) . fmap (\(Dot l pos) -> (pos, pure l))
+
+defMap = Map.insertWith (++) 0 [T] $ Map.fromList $ fmap (,[]) xs
+ where
+  xs = V2 <$> [-11 .. 14] <*> [-5 .. 15]
+
+  limU = 5
+  limD = 5
+
+fp x = case x of
+  [] -> "."
+  [T] -> "s"
+  labs -> show $ minimum labs
+
+printMap :: Map.Map (V2 Int) [Label] -> IO ()
+printMap m = do
+  putStrLn "--------"
+  let xs = Map.toList $ Map.mapKeys (\(V2 x y) -> V2 y x) m
+  let g = groupOn (\(V2 x y, _) -> x) xs
+  let gg = reverse $ (fmap . concatMap) (fp . snd) g
+
+  mapM_ (print . sort) $ Map.filter (\x -> length x > 1) m
+  mapM_ putStrLn gg
+  putStrLn ""
 
 run :: String -> IO ()
 run xs = do
   let parsed = parse xs
-  print parsed
-  -- print resA
 
   let resA = solveA parsed
   print resA
-  -- mapM_ print $ groupOn (view _x) $ sort $ nub $ fmap snd $ solveA parsed
-  -- print "--"
-  -- mapM print $ sort $ fmap snd $ solveA parsed
+  resA @=? 6269
 
   let resB = solveB parsed
-  mapM print resB
+  print resB
 
-  -- mapM_ print $ zip resA resA'
-
-  pure ()
+  resB @=? 2557
