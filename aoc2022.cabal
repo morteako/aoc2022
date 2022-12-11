@@ -67,6 +67,7 @@ library
       KindSignatures
       MonomorphismRestriction
       MultiParamTypeClasses
+      MultiWayIf
       NamedFieldPuns
       NamedWildCards
       NumericUnderscores
@@ -157,6 +158,7 @@ executable app
       KindSignatures
       MonomorphismRestriction
       MultiParamTypeClasses
+      MultiWayIf
       NamedFieldPuns
       NamedWildCards
       NumericUnderscores

@@ -60,3 +60,29 @@ traceOn f x = trace (f x) x
 
 (.?) :: Show t1 => (t2 -> t1) -> (t1 -> t3) -> t2 -> t3
 (.?) f g = \x -> g $ traceShowId (f x)
+
+-- makeMap :: [Dot] -> Map.Map (V2 Int) [Label]
+-- makeMap = Map.unionWith (<>) defMap . Map.fromListWith (<>) . fmap (\(Dot l pos) -> (pos, pure l))
+
+-- defMap = Map.insertWith (++) 0 [T] $ Map.fromList $ fmap (,[]) xs
+--  where
+--   xs = V2 <$> [-11 .. 14] <*> [-5 .. 15]
+
+--   limU = 5
+--   limD = 5
+
+-- fp x = case x of
+--   [] -> "."
+--   [T] -> "s"
+--   labs -> show $ minimum labs
+
+-- printMap :: Map.Map (V2 Int) [Label] -> IO ()
+-- printMap m = do
+--   putStrLn "--------"
+--   let xs = Map.toList $ Map.mapKeys (\(V2 x y) -> V2 y x) m
+--   let g = groupOn (\(V2 x y, _) -> x) xs
+--   let gg = reverse $ (fmap . concatMap) (fp . snd) g
+
+--   mapM_ (print . sort) $ Map.filter (\x -> length x > 1) m
+--   mapM_ putStrLn gg
+--   putStrLn ""

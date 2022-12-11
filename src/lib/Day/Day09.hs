@@ -1,27 +1,19 @@
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MultiWayIf #-}
-
 module Day.Day09 (run) where
 
 import Control.Lens (view)
 import Data.Containers.ListUtils (nubOrd)
-import Data.List
-import Data.List.Extra
 import Data.Map qualified as Map
-import Debug.Trace
-import Linear
+import Linear (V2 (..))
 import Test.HUnit ((@=?))
 import Utils (readInt)
 import Utils qualified
 
 data Dir = R | L | D | U deriving (Read, Enum, Show)
 
-instance Show Dot where
-  show (Dot l (V2 x y)) = "D" ++ show l ++ " " ++ show (x, y)
+data Move = Dir :> Int deriving (Show)
 
-data Move a = a :> Int deriving (Show, Functor)
-
-parse = fmap parseMove . lines
+parseMoves :: String -> [Move]
+parseMoves = fmap parseMove . lines
  where
   parseMove (words -> [l, readInt -> n]) = read @Dir l :> n
 
@@ -38,16 +30,14 @@ instance Show Label where
   show T = "T"
   show (Lab n) = show n
 
-data Dot = Dot Label (V2 Int) deriving ()
+data Dot = Dot Label (V2 Int)
 
-getDotPos (Dot _ p) = p
-
+doDirNew :: [Move] -> [Dot] -> [[Dot]]
 doDirNew [] ht = [ht]
 doDirNew ((_ :> 0) : rest) ht = doDirNew rest ht
 doDirNew ddd@(d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDirNew (d :> n : rest) newHT
  where
-  moveDir = dirToVec d
-  newHPos = hpos + moveDir
+  newHPos = hpos + dirToVec d
   newH = Dot hlab newHPos
 
   newHT = getTails hpos newH ts
@@ -74,7 +64,7 @@ doDirNew ddd@(d :> (subtract 1 -> n) : rest) ht@(Dot hlab hpos : ts) = ht : doDi
                   Dot tlab tpos
               | isDoubleDiag curHeadPos tpos ->
                   Dot tlab prevHead
-              | otherwise -> error $ "hmm" ++ show (ddd, prevHead, curHeadPos, tt)
+              | otherwise -> undefined
      in d : getTails tpos res tts
 doDirNew _ _ = undefined
 
@@ -107,53 +97,23 @@ isTwoDirAway a b = case (a - b) of
   V2 0 2 -> Just $ a - V2 0 1
   _ -> Nothing
 
--- \| view _x h ==
-
-more = length . nub . fmap getDotPos . fmap last
-
--- solveA moves = more id $ doDirTwo moves [0, 0]
-
-solveA moves = length . nub . fmap getDotPos . fmap last $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1]
-
-solveB moves = more $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1 .. 9]
-
--- f !(cur : (traceLab "cd" -> cs)) (traceLab "f" -> dir) = doDir dir cur ++ cur : cs
-
-makeMap :: [Dot] -> Map.Map (V2 Int) [Label]
-makeMap = Map.unionWith (<>) defMap . Map.fromListWith (<>) . fmap (\(Dot l pos) -> (pos, pure l))
-
-defMap = Map.insertWith (++) 0 [T] $ Map.fromList $ fmap (,[]) xs
+countLastTailPoses :: [[Dot]] -> Int
+countLastTailPoses = length . nubOrd . fmap getDotPos . fmap last
  where
-  xs = V2 <$> [-11 .. 14] <*> [-5 .. 15]
+  getDotPos (Dot _ p) = p
 
-  limU = 5
-  limD = 5
-
-fp x = case x of
-  [] -> "."
-  [T] -> "s"
-  labs -> show $ minimum labs
-
-printMap :: Map.Map (V2 Int) [Label] -> IO ()
-printMap m = do
-  putStrLn "--------"
-  let xs = Map.toList $ Map.mapKeys (\(V2 x y) -> V2 y x) m
-  let g = groupOn (\(V2 x y, _) -> x) xs
-  let gg = reverse $ (fmap . concatMap) (fp . snd) g
-
-  mapM_ (print . sort) $ Map.filter (\x -> length x > 1) m
-  mapM_ putStrLn gg
-  putStrLn ""
+countTailPositions :: [Move] -> Int -> Int
+countTailPositions moves numTails = countLastTailPoses $ doDirNew moves $ [Dot H 0] ++ fmap (\x -> Dot (Lab x) 0) [1 .. numTails]
 
 run :: String -> IO ()
 run xs = do
-  let parsed = parse xs
+  let parsed = parseMoves xs
 
-  let resA = solveA parsed
+  let resA = countTailPositions parsed 1
   print resA
   resA @=? 6269
 
-  let resB = solveB parsed
+  let resB = countTailPositions parsed 9
   print resB
 
   resB @=? 2557
