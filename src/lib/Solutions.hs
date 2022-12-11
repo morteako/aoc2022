@@ -10,13 +10,14 @@ import Day.Day05StateLens qualified
 import Day.Day06 qualified
 import Day.Day07 qualified
 import Day.Day08 qualified
+import Day.Day09 qualified
+import Day.Day10 qualified
+import Day.Day11 qualified
 
 import Data.Map (Map)
 import Data.Map qualified as Map
-import Day.Day10 qualified
-import Day.Day11 qualified
 import DayVersion (DayVersion (NormalDay, SpecialVersion))
-import Utils
+import Utils ((=:))
 
 solutions :: Map DayVersion (String -> IO ())
 solutions =
@@ -31,6 +32,7 @@ solutions =
     , "06" =: Day.Day06.run
     , "07" =: Day.Day07.run
     , "08" =: Day.Day08.run
+    , "09" =: Day.Day09.run
     , "10" =: Day.Day10.run
     , "11" =: Day.Day11.run
     ]

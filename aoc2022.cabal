@@ -29,6 +29,7 @@ library
       Day.Day06
       Day.Day07
       Day.Day08
+      Day.Day09
       Day.Day10
       Day.Day11
       Day.DayTemplate
@@ -68,6 +69,7 @@ library
       KindSignatures
       MonomorphismRestriction
       MultiParamTypeClasses
+      MultiWayIf
       NamedFieldPuns
       NamedWildCards
       NumericUnderscores
@@ -158,6 +160,7 @@ executable app
       KindSignatures
       MonomorphismRestriction
       MultiParamTypeClasses
+      MultiWayIf
       NamedFieldPuns
       NamedWildCards
       NumericUnderscores

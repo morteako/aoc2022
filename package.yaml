@@ -41,6 +41,7 @@ default-extensions:
   - KindSignatures
   - MonomorphismRestriction
   - MultiParamTypeClasses
+  -  MultiWayIf
   - NamedFieldPuns
   - NamedWildCards
   - NumericUnderscores
@@ -63,6 +64,8 @@ default-extensions:
   - ViewPatterns
   - LambdaCase
   - PatternSynonyms
+
+
 
 
 ghc-options:
