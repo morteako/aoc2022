@@ -9,6 +9,7 @@ import Control.Lens (
   (<.),
   (<.>),
  )
+import Data.Foldable
 import Data.Graph.Inductive (Graph (mkGraph))
 import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive.Query (sp)
@@ -51,11 +52,10 @@ toTup (x, y, _) = (x, y)
 
 data StartEnd = [Int] :=> Int
 
-makeGraph :: _ -> Map (V2 Int) _ -> (Gr (V2 Int) Int, _, _)
+makeGraph :: [S] -> Map (V2 Int) _ -> (Gr (V2 Int) Int, _)
 makeGraph startSymbols grid =
-  ( mkGraph (fmap swap $ Map.toList nodeMap) (fmap makeLedge $ fmap toTup $ remNotValid $ concat $ Map.elems $ gridWithHeighDiffs)
+  ( mkGraph (swap <$> Map.toList nodeMap) (fmap (makeLedge . toTup) <$> remNotValid . fold $ gridWithHeighDiffs)
   , start :=> end
-  , nodeMap
   )
  where
   charGrid = fmap getVal grid
@@ -83,7 +83,7 @@ getShortestPathtoEnd :: [S] -> Map (V2 Int) S -> Int
 getShortestPathtoEnd startSymbols grid = minimum $ fmap (pred . length) res
  where
   res = mapMaybe (\s -> sp s end g) starts
-  (g, starts :=> end, nodeMap) = makeGraph startSymbols grid
+  (g, starts :=> end) = makeGraph startSymbols grid
 
 run :: String -> IO ()
 run xs = do
