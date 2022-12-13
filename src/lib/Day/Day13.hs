@@ -3,11 +3,11 @@
 
 module Day.Day13 (run) where
 
-import Data.List.Extra
-import Data.Semigroup
+import Data.List
+import Data.List.Extra (chunksOf)
+import Data.Semigroup (Product (Product))
 import GHC.Exts (IsList (..))
 import Test.HUnit ((@=?))
-import Text.Read (readMaybe)
 
 data P = S Int | L [P] deriving (Eq, Show)
 
@@ -329,26 +329,6 @@ xs =
   , [[10, 3, 7], [4, 5, [[8, 10, 2, 10, 9], 10, [0], 7], 3], [[], 0]]
   ]
 
-lists :: [P]
-lists =
-  [ [1, 1, 3, 1, 1]
-  , [1, 1, 5, 1, 1]
-  , [[1], [2, 3, 4]]
-  , [[1], 4]
-  , [9]
-  , [[8, 7, 6]]
-  , [[4, 4], 4, 4]
-  , [[4, 4], 4, 4, 4]
-  , [7, 7, 7, 7]
-  , [7, 7, 7]
-  , []
-  , [3]
-  , [[[]]]
-  , [[]]
-  , [1, [2, [3, [4, [5, 6, 7]]]], 8, 9]
-  , [1, [2, [3, [4, [5, 6, 0]]]], 8, 9]
-  ]
-
 instance Ord P where
   compare :: P -> P -> Ordering
   compare (S n) (S i) = compare n i
@@ -356,27 +336,24 @@ instance Ord P where
   compare (L ps) (S n) = compare (L ps) (L [S n])
   compare (L ps) (L ps') = compare ps ps'
 
-parse = id
-
 solveA :: [P] -> Int
 solveA = sum . fmap fst . filter (snd) . zip [1 :: Int ..] . fmap f . chunksOf 2
  where
   f [a, b] = a <= b
 
+divs :: [P]
 divs = [[[2]], [[6]]] :: [P]
 
-solveB :: [P] -> _
-solveB ((++ divs) -> sort -> res) = foldMap (\x -> Product . succ <$> findIndex (== x) res) divs
+solveB :: [P] -> Maybe (Product Int)
+solveB ((++ divs) -> sort -> res) = foldMap (\x -> Product . succ <$> elemIndex x res) divs
 
 run :: String -> IO ()
 run _ = do
-  let parsed = parse xs
-  print parsed
-  let resA = solveA parsed
+  let resA = solveA xs
   print resA
 
-  -- resA @=? 1715
-  let resB = solveB parsed
+  resA @=? 5684
+  let resB = solveB xs
   print resB
 
--- resB @=? 1739
+  resB @=? Just 22932
