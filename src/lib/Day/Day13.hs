@@ -5,6 +5,7 @@
 
 module Day.Day13 (run) where
 
+import Control.Lens
 import Data.List (elemIndex, sort)
 import Data.List.Extra (chunksOf, sumOn')
 import Data.Semigroup (Product (Product))
@@ -30,12 +31,12 @@ instance Ord P where
   compare (L ps) (L ps') = compare ps ps'
 
 solveA :: [P] -> Int
-solveA = sumOn' fst . filter (snd) . zip [1 :: Int ..] . fmap f . chunksOf 2
+solveA = sumOf (to (chunksOf 2) . ifolded . filtered f . asIndex . to succ)
  where
   f [a, b] = a <= b
 
 divs :: [P]
-divs = [[[2]], [[6]]] :: [P]
+divs = [[[2]], [[6]]]
 
 solveB :: [P] -> Maybe Int
 solveB ((++ divs) -> sort -> res) = product . fmap succ <$> traverse (\x -> elemIndex x res) divs
