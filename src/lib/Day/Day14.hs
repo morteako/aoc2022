@@ -1,19 +1,20 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Day.Day14 (run) where
 
-import Test.HUnit ((@=?))
-
 import Control.Lens
-import Data.List.Extra
+import Data.List.Extra (splitOn)
 import Data.List.Split (splitOneOf)
 import Data.Map (Map)
 import Data.Map qualified as Map
-
-import Control.Monad
-import Data.Maybe
-import Debug.Trace
+import Data.Maybe (mapMaybe)
+import Data.Semigroup (Max (Max))
 import Linear
+import Test.HUnit ((@=?))
 
-data Stru = Rock | MovSand | RestSand | Air deriving (Eq, Ord)
+data Stru = Rock | RestSand deriving (Eq, Ord)
 
 parseAsciiMap ::
   (Char -> Maybe a) ->
@@ -23,26 +24,19 @@ parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
  where
   asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
 
-instance Show Stru where
-  show :: Stru -> String
-  show Rock = "#"
-  show MovSand = "+"
-  show RestSand = "o"
-  show Air = "."
+parseIntoGrid :: Part' part => String -> Grid part
+parseIntoGrid = makeGridFromRockCoords . parseRockCoords
 
-sandPoint = V2 500 0
-
-parse = fmap (fmap (toCoord . splitOn ",") . splitOn " -> ") . lines
+parseRockCoords :: String -> [[V2 Int]]
+parseRockCoords = fmap (fmap (toCoord . splitOn ",") . splitOn " -> ") . lines
  where
-  toCoord [a, b] = V2 (read @Int a) (read b)
+  toCoord (fmap read -> [a, b]) = V2 a b
   toCoord xs = error $ show xs
-
-getDir a b = fmap (negate . mami1) (a - b)
 
 makeLine :: Point -> Point -> [Point]
 makeLine a b = go a b
  where
-  d = getDir a b
+  d = fmap (negate . mami1) (a - b)
   go m n | m == n = [m]
   go m n = m : go (m + d) n
 
@@ -50,66 +44,85 @@ mami1 x = max (-1) (min 1 x)
 
 type Point = V2 Int
 
-type Grid = G (Map Point Stru)
+type Grid (part :: Part) = G part (Map Point Stru)
 
-data G g = g :~ Int deriving (Functor, Show)
+data G (part :: Part) g = g :~ Int deriving (Functor, Show)
 
+data Part = Part1 | Part2 deriving (Eq)
+
+class Part' a where
+  -- add2IfPart2 :: Num n => n -> n
+  partFallForever :: Int -> Int -> Bool
+  partFloorCheck :: Int -> Int -> Bool
+
+instance Part' Part1 where
+  -- add2IfPart2 = id
+  partFloorCheck _ _ = False
+  partFallForever y lim = y > (lim)
+
+-- test
+
+instance Part' Part2 where
+  -- add2IfPart2 = (+ 2)
+  partFloorCheck y lim = y + 1 == (lim + 2)
+  partFallForever _ _ = False
+
+getGrid :: G p g -> g
 getGrid (g :~ _) = g
 
-makeGridFromLines :: [[Point]] -> Grid
-makeGridFromLines rockLines = ((Map.fromList $ (,Rock) <$> concatMap oneLine rockLines) :~ ylim)
+makeGridFromRockCoords :: forall part. Part' part => [[Point]] -> Grid part
+makeGridFromRockCoords rockLines = ((Map.fromList $ (,Rock) <$> rockCoords) :~ ylim)
  where
-  ss = concatMap oneLine rockLines
-  ylim = maximum $ fmap (view _y) ss
-  oneLine rl = concatMap f $ zip rl (tail rl)
-  f (a, b) = makeLine a b
+  rockCoords = concatMap oneLine rockLines
+  Max ylim = foldMap (Max . view _y) rockCoords
+  oneLine rl = concatMap (uncurry makeLine) $ zip rl (tail rl)
 
--- data SandGrid = Point :=> Map Point Stru
-
+oneDown, oneLeft, oneRight :: V2 Int -> V2 Int
 oneDown = (+ V2 0 1)
 oneLeft = (+ V2 (-1) 0)
 oneRight = (+ V2 1 0)
 
-moveOne = moveOneSand sandPoint
-
-moveOneSand :: V2 Int -> Grid -> Either Grid Grid
-moveOneSand (V2 _ y) g@(_ :~ lim) | y > lim = Left g
-moveOneSand p g@(grid :~ _) = case mapMaybe check moves of
-  [] ->
-    (if p == V2 500 0 then Left else Right) $ Map.insert p RestSand <$> g
-  k : _ -> moveOneSand k g
+moveOne :: forall (p :: Part). Part' p => (Grid p) -> Either (Grid p) (Grid p)
+moveOne = moveOneSand (V2 500 0)
  where
-  moves = [next, nextLeft, nextRight]
+  moveOneSand :: V2 Int -> (Grid p) -> Either (Grid p) (Grid p)
+  moveOneSand (V2 _ y) g@(_ :~ lim) | partFallForever @p y lim = Left g
+  moveOneSand p@(V2 _ y) g@(grid :~ lim) = case mapMaybe check moves of
+    [] ->
+      (if p == V2 500 0 then Left else Right) $ Map.insert p RestSand <$> g
+    k : _ -> moveOneSand k g
+   where
+    moves = [next, nextLeft, nextRight]
 
-  next = oneDown p
-  nextLeft = oneLeft $ oneDown p
-  nextRight = oneRight $ oneDown p
+    next = oneDown p
+    nextLeft = oneLeft $ oneDown p
+    nextRight = oneRight $ oneDown p
 
-  check k = case Map.lookup k grid of
-    Nothing -> Just k
-    Just Air -> Just k
-    Just _ -> Nothing
+    -- check k | y + 1 == lim = Nothing
+    check k | partFloorCheck @p y lim = Nothing
+    check k | Map.member k grid = Nothing
+    check k = Just k
 
+-- hmm. is this a lib function?
+untilLeft :: (t -> Either a t) -> Either a t -> a
 untilLeft f (Left x) = x
 untilLeft f (Right x) = untilLeft f $ f x
 
-solveA = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right . makeGridFromLines
+solveA :: Grid Part1 -> Int
+solveA = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right
 
-solveB = id
+solveB :: Grid Part2 -> Int
+solveB = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right
 
 run :: String -> IO ()
 run xs = do
-  print xs
-  let parsed = parse xs
-  print parsed
-  let resA = solveA parsed
-  -- mapM_ print $ Map.toList resA
+  let parsedA = parseIntoGrid xs
+  let resA = solveA parsedA
   print resA
+  resA @=? 897
 
--- print $ makeLine (V2 3 2) (V2 1 2)
--- print $ makeLine (V2 3 0) (V2 3 5)
+  let parsedB = parseIntoGrid xs
+  let resB = solveB parsedB
+  print resB
 
--- resA @=? 1715
--- let resB = solveB parsed
--- print resB
--- resB @=? 1739
+  resB @=? 26683
