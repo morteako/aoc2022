@@ -51,46 +51,43 @@ data G (part :: Part) g = g :~ Int deriving (Functor, Show)
 data Part = Part1 | Part2 deriving (Eq)
 
 class Part' a where
-  -- add2IfPart2 :: Num n => n -> n
   partFallForever :: Int -> Int -> Bool
   partFloorCheck :: Int -> Int -> Bool
 
 instance Part' Part1 where
-  -- add2IfPart2 = id
   partFloorCheck _ _ = False
   partFallForever y lim = y > (lim)
 
 -- test
 
 instance Part' Part2 where
-  -- add2IfPart2 = (+ 2)
   partFloorCheck y lim = y + 1 == (lim + 2)
   partFallForever _ _ = False
 
 getGrid :: G p g -> g
 getGrid (g :~ _) = g
 
-makeGridFromRockCoords :: forall part. Part' part => [[Point]] -> Grid part
+makeGridFromRockCoords :: [[Point]] -> Grid part
 makeGridFromRockCoords rockLines = ((Map.fromList $ (,Rock) <$> rockCoords) :~ ylim)
  where
   rockCoords = concatMap oneLine rockLines
   Max ylim = foldMap (Max . view _y) rockCoords
-  oneLine rl = concatMap (uncurry makeLine) $ zip rl (tail rl)
+  oneLine rl = concat $ zipWith makeLine rl (tail rl)
 
 oneDown, oneLeft, oneRight :: V2 Int -> V2 Int
 oneDown = (+ V2 0 1)
 oneLeft = (+ V2 (-1) 0)
 oneRight = (+ V2 1 0)
 
-moveOne :: forall (p :: Part). Part' p => (Grid p) -> Either (Grid p) (Grid p)
+moveOne :: forall p. Part' p => (Grid p) -> Either (Grid p) (Grid p)
 moveOne = moveOneSand (V2 500 0)
  where
-  moveOneSand :: V2 Int -> (Grid p) -> Either (Grid p) (Grid p)
   moveOneSand (V2 _ y) g@(_ :~ lim) | partFallForever @p y lim = Left g
   moveOneSand p@(V2 _ y) g@(grid :~ lim) = case mapMaybe check moves of
     [] ->
       (if p == V2 500 0 then Left else Right) $ Map.insert p RestSand <$> g
-    k : _ -> moveOneSand k g
+    k : _ ->
+      moveOneSand k g
    where
     moves = [next, nextLeft, nextRight]
 
@@ -98,7 +95,6 @@ moveOne = moveOneSand (V2 500 0)
     nextLeft = oneLeft $ oneDown p
     nextRight = oneRight $ oneDown p
 
-    -- check k | y + 1 == lim = Nothing
     check k | partFloorCheck @p y lim = Nothing
     check k | Map.member k grid = Nothing
     check k = Just k
@@ -108,21 +104,18 @@ untilLeft :: (t -> Either a t) -> Either a t -> a
 untilLeft f (Left x) = x
 untilLeft f (Right x) = untilLeft f $ f x
 
-solveA :: Grid Part1 -> Int
-solveA = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right
-
-solveB :: Grid Part2 -> Int
-solveB = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right
+countSands :: Part' p => Grid p -> Int
+countSands = Map.size . Map.filter (== RestSand) . getGrid . untilLeft moveOne . Right
 
 run :: String -> IO ()
 run xs = do
   let parsedA = parseIntoGrid xs
-  let resA = solveA parsedA
+  let resA = countSands @Part1 parsedA
   print resA
   resA @=? 897
 
   let parsedB = parseIntoGrid xs
-  let resB = solveB parsedB
+  let resB = countSands @Part2 parsedB
   print resB
 
   resB @=? 26683
