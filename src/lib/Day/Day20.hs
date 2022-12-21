@@ -28,11 +28,10 @@ getNs xs = sumOn' (snd . Seq.index xs . getNIndex) [1000, 2000, 3000]
   Just wrapIndex = Seq.findIndexL (\(_, n) -> n == 0) xs
 
 rotateNTimes :: Maybe Int -> Int -> Seq.Seq (StartPos, Int) -> Int
-rotateNTimes decryptionKey n seq = getNs $ (!! n) $ iterate doOne newM
+rotateNTimes decryptionKey n seq = getNs $ (!! n) $ iterate doOne seqAfterDecryption
  where
-  doOne w = foldl' (flip move) w $ newM
-  q = toList newM
-  newM = maybe id (\key -> (fmap . fmap) (* key)) decryptionKey seq
+  doOne w = foldl' (flip move) w $ seqAfterDecryption
+  seqAfterDecryption = maybe id (\key -> (fmap . fmap) (* key)) decryptionKey seq
 
 run :: String -> IO ()
 run xs = do
