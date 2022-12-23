@@ -43,11 +43,11 @@ foldl1' f xs =
                 Just x -> f x y
             )
 
-printMap :: (Show a, Eq k) => Map.Map (V2 k) a -> IO ()
+printMap :: (Show a, Ord k) => Map.Map (V2 k) a -> IO ()
 printMap m = do
     putStrLn "--------"
     let xs = Map.toList m
-    let g = groupOn (\(V2 x _, _) -> x) xs
+    let g = groupOn (\(V2 _ y, _) -> y) $ sortOn (\(V2 x y, _) -> V2 y x) xs
     let gg = fmap (fmap snd) g
     mapM_ print gg
     putStrLn ""

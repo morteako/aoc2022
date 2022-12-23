@@ -18,6 +18,7 @@ import Day.Day13 qualified
 import Day.Day14 qualified
 import Day.Day20 qualified
 import Day.Day21 qualified
+import Day.Day23 qualified
 
 import Data.Map (Map)
 import Data.Map qualified as Map
@@ -45,4 +46,5 @@ solutions =
     , "14" =: Day.Day14.run
     , "20" =: Day.Day20.run
     , "21" =: Day.Day21.run
+    , "23" =: Day.Day23.run
     ]
