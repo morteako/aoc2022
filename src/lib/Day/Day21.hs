@@ -47,13 +47,12 @@ solveA m = evalExpToInt $ evalState (evalExp (m Map.! "root")) m
 data Exp = LitI Int | LitU | LitS String | BinB Op Exp Exp deriving (Show)
 
 evalExp :: Exp -> State (Map String Exp) Exp
-evalExp (LitI n) = pure $ LitI n
-evalExp (LitU) = pure LitU
+evalExp l@LitI{} = pure l
+evalExp LitU = pure LitU
 evalExp (LitS s) = do
-  q <- gets (Map.! s)
-  qq <- evalExp q
-  ix s .= qq
-  pure qq
+  e <- gets (Map.! s) >>= evalExp
+  ix s .= e
+  pure e
 evalExp (BinB op l r) = do
   BinB op <$> evalExp l <*> evalExp r
 
