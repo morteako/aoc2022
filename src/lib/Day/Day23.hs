@@ -1,20 +1,16 @@
 module Day.Day23 (run) where
 
 import Control.Lens
-import Data.Coerce
-import Data.Foldable
+import Data.Coerce (coerce)
+import Data.Foldable (asum)
+import Data.HashSet (HashSet)
+import Data.HashSet as Set
 import Data.List qualified as List
 import Data.Map (Map)
 import Data.Map qualified as Map hiding (null)
-import Data.Maybe
-import Data.Semigroup
+import Data.Maybe (isJust)
+import Data.Semigroup (Max (Max), Min (Min))
 import Data.Set (Set)
-
--- import Data.Set qualified as Set hiding (drop, null, take)
-
-import Data.HashSet (HashSet)
-import Data.HashSet as Set
-
 import Linear (V2 (..))
 import Test.HUnit ((@=?))
 
@@ -42,8 +38,10 @@ getDirV S = V2 0 1
 getDirV W = V2 (-1) 0
 getDirV E = V2 1 0
 
+ords :: [([Dir], Dir)]
 ords = [([N, W, E], N), ([S, W, E], S), ([N, S, W], W), ([N, S, E], E)]
 
+cyc :: Int -> [a] -> [a]
 cyc (flip mod 4 -> id -> n) xs =
   drop n $ take (4 + n) $ cycle xs
 
@@ -63,6 +61,7 @@ getNeighs' v@(V2 x y) = fmap f ords
   g dir d | d == dir = v + getDirV d
   g dir d = v + getDirV d + getDirV dir
 
+oneRound :: (Int, HashSet (V2 Int)) -> (Int, HashSet (V2 Int))
 oneRound (i, m) = (i + 1, Map.foldMapWithKey f newPoses)
  where
   f k [x] = Set.singleton k
@@ -79,6 +78,7 @@ getEdges = coerce . foldMap f
  where
   f (V2 x y) = (Min x, Max x, Min y, Max y)
 
+solveA :: HashSet (V2 Int) -> Int
 solveA grid = rect - Set.size res
  where
   (_, res) = (!! 10) $ iterate oneRound (0, grid)
@@ -86,6 +86,7 @@ solveA grid = rect - Set.size res
 
   rect = (1 + ax - ia) * (1 + ay - iy)
 
+solveB :: HashSet (V2 Int) -> Maybe Int
 solveB grid = fmap succ $ List.findIndex (uncurry (==)) $ ps
  where
   ps = (zip <*> tail) $ snd <$> iterate oneRound (0, grid)
