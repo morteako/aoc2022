@@ -44,9 +44,8 @@ cyc (flip mod 4 -> id -> n) xs =
   drop n $ take (4 + n) $ cycle xs
 
 getNeighs :: Int -> V2 Int -> Set (V2 Int) -> _
-getNeighs i v m = if length r == 4 then Nothing else fmap fst $ asum $ res
+getNeighs i v m = if all isJust res then Nothing else fmap fst $ asum $ res
  where
-  r = catMaybes res
   res = fmap (traverse $ traverse f) $ cyc i $ getNeighs' v
 
   f d | Set.member d m = Nothing
