@@ -48,35 +48,28 @@ getNeighs i v m = if length r == 4 then Nothing else fmap fst $ asum $ res
  where
   r = catMaybes res
   res = fmap (traverse $ traverse f) $ cyc i $ getNeighs' v
-  g xs = if length (catMaybes xs) == 4 then Nothing else Just (xs)
 
   f d | Set.member d m = Nothing
   f d = Just ()
 
 getNeighs' :: V2 Int -> [(Dir, [V2 Int])]
-getNeighs' v@(V2 x y) = do
-  (gs, dir) <- ords
-  let dv = getDirV dir
+getNeighs' v@(V2 x y) = fmap f ords
+ where
+  f (gs, dir) = (dir, fmap (g dir) gs)
 
-  pure $ (,) dir $ do
-    d <- gs
-    pure $
-      if d == dir
-        then v + getDirV d
-        else v + getDirV d + dv
-
-move i v m = case getNeighs i v m of
-  Nothing -> v
-  Just d -> getDirV d + v
-
--- delRem m s = Set.fromList (Map.elems m) <> Set.difference s (Map.keysSet m)
+  g dir d | d == dir = v + getDirV d
+  g dir d = v + getDirV d + getDirV dir
 
 oneRound (i, m) = (i + 1, Map.foldMapWithKey f newPoses)
  where
   f k [x] = Set.singleton k
   f _ xs = Set.fromList xs
 
-  newPoses = Map.unionsWith (++) $ foldMap (\k -> [Map.singleton (move i k m) [k]]) m
+  newPoses = Map.unionsWith (++) $ foldMap (\k -> [Map.singleton (move k) [k]]) m
+
+  move v = case getNeighs i v m of
+    Nothing -> v
+    Just d -> getDirV d + v
 
 getEdges :: Set (V2 Int) -> (Int, Int, Int, Int)
 getEdges = coerce . foldMap f
@@ -85,7 +78,7 @@ getEdges = coerce . foldMap f
 
 solveA grid = rect - Set.size res
  where
-  (_, res) = last $ take 11 $ iterate oneRound (0, grid)
+  (_, res) = (!! 10) $ iterate oneRound (0, grid)
   (ia, ax, iy, ay) = getEdges res
 
   rect = (1 + ax - ia) * (1 + ay - iy)
