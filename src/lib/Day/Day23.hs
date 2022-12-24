@@ -9,7 +9,11 @@ import Data.Map qualified as Map hiding (null)
 import Data.Maybe
 import Data.Semigroup
 import Data.Set (Set)
-import Data.Set qualified as Set hiding (drop, null, take)
+
+-- import Data.Set qualified as Set hiding (drop, null, take)
+
+import Data.HashSet (HashSet)
+import Data.HashSet as Set
 
 import Linear (V2 (..))
 import Test.HUnit ((@=?))
@@ -25,7 +29,7 @@ parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
   asciiGrid :: IndexedFold Point String Char
   asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
 
-parse = Map.keysSet . parseAsciiMap parseElf
+parse = Set.fromList . Map.keys . parseAsciiMap parseElf
  where
   parseElf '#' = Just ()
   parseElf _ = Nothing
@@ -43,7 +47,7 @@ ords = [([N, W, E], N), ([S, W, E], S), ([N, S, W], W), ([N, S, E], E)]
 cyc (flip mod 4 -> id -> n) xs =
   drop n $ take (4 + n) $ cycle xs
 
-getNeighs :: Int -> V2 Int -> Set (V2 Int) -> _
+getNeighs :: Int -> V2 Int -> HashSet (V2 Int) -> _
 getNeighs i v m = if all isJust res then Nothing else fmap fst $ asum $ res
  where
   res = fmap (traverse $ traverse f) $ cyc i $ getNeighs' v
@@ -70,7 +74,7 @@ oneRound (i, m) = (i + 1, Map.foldMapWithKey f newPoses)
     Nothing -> v
     Just d -> getDirV d + v
 
-getEdges :: Set (V2 Int) -> (Int, Int, Int, Int)
+getEdges :: HashSet (V2 Int) -> (Int, Int, Int, Int)
 getEdges = coerce . foldMap f
  where
   f (V2 x y) = (Min x, Max x, Min y, Max y)
